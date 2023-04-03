@@ -1,0 +1,114 @@
+﻿@page "/GameEnd"
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JSRuntime
+
+@using RaceTo21
+
+<style>
+    h1 {
+        color: #FF7F50;
+        text-align: center;
+    }
+
+    h2 {
+        color: #D2691E;
+        text-align: center;
+    }
+
+    #title-container {
+        text-align: center;
+    }
+
+    #subtitle {
+        text-align: right;
+    }
+
+        #subtitle h2 {
+            font-size: 16px;
+        }
+
+    .my-button {
+        background-color: #008B8B;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        font-size: 16px;
+        cursor: pointer;
+    }
+
+        .my-button:hover, .my-button.hover {
+            background-color: #00FFFF;
+        }
+
+    .player-info {
+        display: flex;
+        align-items: center;
+    }
+
+    .avatar {
+        margin-right: 10px;
+        width: 50px;
+        height: 50px;
+        object-fit: cover;
+        border-radius: 50%;
+    }
+</style>
+
+<h1>Winner </h1>
+@foreach (var player in Game.players) 
+
+    if (player.status == PlayerStatus.win) 
+    {
+       
+                        <img src="https://i.pinimg.com/564x/03/21/ae/0321ae638563362bbbff9b99b5504030.jpg" alt="Default Avatar" class="avatar">
+        <h2>@player.name</h2>
+       
+    }
+
+<h3>Ready for next round? </h3>
+<form>
+    @foreach (var player in Game.players) 
+    {
+        <div class="form-group">
+            <label for="@($"player{Game.players.IndexOf(player)}")">Player: @player.name</label>
+            @if (player.status != PlayerStatus.quit) // If the player's status is not "quit"
+            {
+                <div>
+                    <button type="button" class="my-button"
+                    @onclick="() => UpdatePlayerStatus(player, PlayerStatus.active)">
+                        Ready
+                    </button>
+                    <button type="button" class="my-button"
+                    @onclick="() => UpdatePlayerStatus(player, PlayerStatus.quit)">
+                        Quit
+                    </button>
+                </div>
+            }
+        </div>
+    }
+    @if (Game.players.Count(p => p.status == PlayerStatus.active) == 0)
+    {
+        <button type="button" class="btn btn-primary" @onclick="StartNewRound" disabled>Start New Round</button>
+    }
+    {
+        <button type="button" class="btn btn-primary" @onclick="StartNewRound">Start New Round</button>
+       
+</form>
+
+@code {
+    public void UpdatePlayerStatus(Player player, PlayerStatus status) // Updates a player's status
+    {
+        player.status = status; // Remove unneeded players
+        if (status == PlayerStatus.quit)
+        {
+            Game.players.Remove(player);
+        }
+    }
+
+    public void StartNewRound()
+    {
+
+        // Start new round
+        NavigationManager.NavigateTo("/Game"); // Navigates to the "/Game" page
+    }
+}
